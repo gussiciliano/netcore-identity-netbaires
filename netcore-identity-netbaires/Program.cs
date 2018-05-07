@@ -22,8 +22,7 @@ namespace netcore_identity_netbaires
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseKestrel(
-                options =>
+                .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Loopback, 5000, listenOptions =>
                     {
