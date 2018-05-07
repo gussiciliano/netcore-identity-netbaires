@@ -16,17 +16,24 @@ namespace netcore_identity_netbaires
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("certificate.json").Build();            
+            var certificateSettings = config.GetSection("certificateSettings");
+            string certificateFileName = certificateSettings.GetValue<string>("filename");
+            string certificatePassword = certificateSettings.GetValue<string>("password");
+            var certificate = new X509Certificate2(certificateFileName, certificatePassword);
+            BuildWebHost(args, certificate).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHost BuildWebHost(string[] args, X509Certificate2 certificate) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseKestrel(options =>
                 {
                     options.Listen(IPAddress.Loopback, 5000, listenOptions =>
                     {
-                        listenOptions.UseHttps(new X509Certificate2("localhost.pfx", "i2dw7i"));
+                        listenOptions.UseHttps(certificate);
                     });
                 })
                 .Build();

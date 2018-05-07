@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using netcore_identity_netbaires.Data;
 using netcore_identity_netbaires.Models;
 using netcore_identity_netbaires.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace netcore_identity_netbaires
 {
@@ -57,7 +59,23 @@ namespace netcore_identity_netbaires
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
-            services.AddMvc();
+            services.AddMvc(
+                options =>
+                {
+                    options.SslPort = 5000;
+                    options.Filters.Add(new RequireHttpsAttribute());
+                }
+            );
+            
+            services.AddAntiforgery(
+                options =>
+                {
+                    options.Cookie.Name = "_af";
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.HeaderName = "X-XSRF-TOKEN";
+                }
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
