@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div style=" display: flex; justify-content:  space-between; margin-top:  40px;">
+    <a class="btn btn-info" asp-controller="authorization" asp-action="Admin">Solo administradores</a>
+    <a class="btn btn-info" asp-controller="authorization" asp-action="User">Solo usuarios registrados</a>
+    <a class="btn btn-info" asp-controller="authorization" asp-action="Everyone">Cualquiera puede entrar</a>
+    <a class="btn btn-info" asp-controller="authorization" asp-action="AtLeast21">Mayores de 21</a>
+</div>

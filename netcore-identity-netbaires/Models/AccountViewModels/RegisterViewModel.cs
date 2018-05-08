@@ -14,6 +14,11 @@ namespace netcore_identity_netbaires.Models.AccountViewModels
         public string Email { get; set; }
 
         [Required]
+        [DataType (DataType.Date)]
+        [Display(Name = "DateOfBirth")]
+        public DateTime DateOfBirth { get; set; }
+
+        [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]

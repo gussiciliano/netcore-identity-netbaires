@@ -11,5 +11,9 @@ namespace netcore_identity_netbaires.Models.AccountViewModels
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime DateOfBirth { get; set; }
     }
 }

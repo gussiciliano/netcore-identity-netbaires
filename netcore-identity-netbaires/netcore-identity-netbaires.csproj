@@ -4,9 +4,6 @@
         <UserSecretsId>aspnet-netcore_identity_netbaires-E0028F31-081B-4277-8EB6-C954C37D5014</UserSecretsId>
     </PropertyGroup>
     <ItemGroup>
-        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" />
-    </ItemGroup>
-    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" PrivateAssets="All" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" PrivateAssets="All" />

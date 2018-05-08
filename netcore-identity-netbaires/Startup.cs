@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using netcore_identity_netbaires.Authorization.Handlers;
+using netcore_identity_netbaires.Authorization.Requirements;
+using netcore_identity_netbaires.Authorization.Roles;
 using netcore_identity_netbaires.Data;
 using netcore_identity_netbaires.Models;
 using netcore_identity_netbaires.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 
 namespace netcore_identity_netbaires
 {
@@ -34,11 +38,13 @@ namespace netcore_identity_netbaires
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, MyUserClaimsPrincipalFactory>();
             services.AddAuthentication()
                 .AddFacebook(facebookOptions =>
                 {
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                    facebookOptions.Scope.Add("user_birthday");
                 })
                 .AddGoogle(googleOptions =>
                 {
@@ -54,8 +60,15 @@ namespace netcore_identity_netbaires
                 {
                     microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ApplicationId"];
                     microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:Password"];
-                });
+                }
+            );
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AtLeast21", policy =>
+                    policy.Requirements.Add(new MinimumAgeRequirement(21)));
+            });
 
+            services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
@@ -66,7 +79,7 @@ namespace netcore_identity_netbaires
                     options.Filters.Add(new RequireHttpsAttribute());
                 }
             );
-            
+
             services.AddAntiforgery(
                 options =>
                 {
@@ -79,7 +92,7 @@ namespace netcore_identity_netbaires
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             if (env.IsDevelopment())
             {
@@ -92,6 +105,7 @@ namespace netcore_identity_netbaires
             }
             app.UseStaticFiles();
             app.UseAuthentication();
+            MyIdentityDataInitializer.SeedData(userManager, roleManager, configuration);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
